@@ -1,0 +1,287 @@
+:root {
+  --paper: #FFFFFF;
+  --ink: #262626;           /* main text: a soft charcoal rather than pure black */
+  --ink-soft: #5E5E5E;      /* secondary text */
+  --score-ink: #1C1C1C;     /* the darkest ink in everything drawn in dots */
+  --score-soft: #5A5A5A;    /* the diffused grey in everything drawn in dots */
+  --graphite: #6E6E6E;      /* the paper grain and page shading */
+  --turned: #222222;        /* the right page once it has turned dark for a case study */
+  --on-dark: #ECECEC;
+  --on-dark-soft: #B4B4B4;
+  --text: "Times New Roman", Times, serif;            /* the title page's type, used everywhere */
+  --title: "Times New Roman", Times, serif;
+  --display: "Times New Roman", Times, serif;
+  --music: "Noto Music", "Bravura Text", serif;
+  --spine-pad: clamp(40px, 5vw, 92px);
+  --edge-pad: clamp(24px, 3.4vw, 64px);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink); overflow: hidden;
+  font-family: var(--text); font-size: 1.0625rem; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--ink); color: var(--paper); }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ink-soft); outline-offset: 4px; }
+
+/* ---------- the open score: two facing pages, edge to edge ---------- */
+.spread { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
+[hidden], .spread[hidden] { display: none !important; }
+.page { position: relative; background: var(--paper); }
+.shade { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+
+/* text redrawn in ink dots: the real text stays (for screen readers and selection) and turns
+   transparent once its dotted copy is drawn on top */
+.ink-text { position: relative; }
+.ink-text.inked, .ink-text.inked * { color: transparent; -webkit-text-fill-color: transparent; }
+.ink-text > canvas.ink { position: absolute; left: -10px; top: -6px; width: calc(100% + 20px); height: calc(100% + 12px); pointer-events: none; }
+
+/* controls written as a word in small braces; on hover a soft grey haze gathers around them */
+.brace {
+  display: inline-flex; align-items: baseline; gap: 0.3em; cursor: pointer; text-decoration: none;
+  font: italic 500 1rem/1 var(--text); color: var(--ink); background: transparent; border: 0;
+  padding: 0.3em 0.6em; margin: -0.3em -0.6em; border-radius: 999px;
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+.brace::before, .brace::after { font-style: normal; font-weight: 400; font-size: 0.85em; color: var(--ink-soft); }
+.brace::before { content: "{"; }
+.brace::after { content: "}"; }
+.brace:hover, .brace:focus-visible { background-color: rgba(96, 96, 96, 0.1); box-shadow: 0 0 12px 7px rgba(96, 96, 96, 0.1); }
+.brace:focus-visible { outline: none; }
+.brace.light { color: var(--on-dark); }
+.brace.light .b { color: var(--on-dark-soft); }
+.brace.light:hover, .brace.light:focus-visible { background-color: rgba(220, 220, 220, 0.1); box-shadow: 0 0 12px 7px rgba(220, 220, 220, 0.09); }
+
+/* ---------- left page: the title page ---------- */
+.page.left {
+  height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 6vh var(--spine-pad) 8vh var(--edge-pad); font-family: var(--title);
+}
+.page.left > :not(.shade) { position: relative; z-index: 1; }
+/* navigation set flush against the left page's inner edge, so it traces the border of the sheet */
+.call-number {
+  position: absolute !important; top: 6vh; right: clamp(22px, 2.4vw, 40px);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.15em; text-align: right;
+}
+.call-number .brace { font-size: 0.95rem; }
+.call-number .caret { font-style: normal; font-size: 0.7em; color: var(--ink-soft); margin-left: 0.15em; }
+.page.left > .call-number { z-index: 20 !important; }   /* the navigation (and its menu) sits above the dotted title */
+.menu { position: relative; }
+/* the Works menu: a soft paper card, no hard outline */
+.works-menu {
+  position: absolute; top: calc(100% + 8px); right: -0.6em; z-index: 30; min-width: 17rem; max-width: 22rem;
+  margin: 0; padding: 0.6em 0.5em; list-style: none; text-align: left; background: var(--paper); border-radius: 0;
+}
+/* graphite shading around the menu's edge, drawn in fine dots like the pages' edges */
+.menu-grain { position: absolute; z-index: 31; pointer-events: none; }
+.works-menu button {
+  display: flex; gap: 0.6em; align-items: baseline; width: 100%; padding: 0.35em 0.65em; text-align: left; cursor: pointer;
+  font: 0.95rem/1.3 var(--text); color: var(--ink); background: transparent; border: 0; border-radius: 999px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.works-menu button:hover, .works-menu button:focus-visible { background-color: rgba(96, 96, 96, 0.08); box-shadow: 0 0 10px 5px rgba(96, 96, 96, 0.08); outline: none; }
+.works-menu .no { flex: none; width: 3em; font-style: italic; color: var(--ink-soft); font-size: 0.9em; }
+.works-menu button[aria-current="page"] { color: var(--ink-soft); cursor: default; }
+.works-menu button[aria-current="page"] .t::after { content: " (this page)"; font-style: italic; font-size: 0.88em; }
+/* braces written as real characters (not CSS decorations), so they can be redrawn in grain too */
+.brace.literal::before, .brace.literal::after { content: none; }
+.brace .b { font-style: normal; font-weight: 400; font-size: 0.85em; color: var(--ink-soft); }
+.title-page { margin-top: 19vh; }
+h1 { margin: 0; font-family: var(--title); font-weight: 400; font-size: clamp(2rem, 3.3vw, 3.2rem); line-height: 1.1; }
+.home { color: inherit; text-decoration: none; display: inline-block; padding: 0 0.15em; border-radius: 0.4em;
+        transition: background-color 0.35s ease, box-shadow 0.35s ease; }
+.home:hover, .home:focus-visible { background-color: rgba(96, 96, 96, 0.07); box-shadow: 0 0 18px 10px rgba(96, 96, 96, 0.07); outline: none; }
+.paren { margin: 0.15em 0 0; font-style: italic; font-size: clamp(1.1rem, 1.8vw, 1.7rem); line-height: 1.2; }
+.opus { margin: 1em 0 0; font-size: clamp(0.98rem, 1.35vw, 1.3rem); }
+.name { margin: 13vh 0 0; font-family: var(--title); font-weight: 400; font-size: clamp(1.55rem, 2.5vw, 2.4rem); line-height: 1.15; }
+.imprint { margin-top: auto; }
+.imprint p { margin: 0; }
+.imprint .email { font-size: clamp(1rem, 1.4vw, 1.35rem); }
+.imprint .linkedin { font-size: clamp(0.88rem, 1.1vw, 1.08rem); margin-top: 0.25em; }
+.imprint a { text-decoration: none; display: inline-block; padding: 0.15em 0.5em; border-radius: 999px;
+             transition: background-color 0.35s ease, box-shadow 0.35s ease; }
+.imprint a:hover, .imprint a:focus-visible { background-color: rgba(96, 96, 96, 0.1); box-shadow: 0 0 12px 7px rgba(96, 96, 96, 0.1); outline: none; }
+
+/* ---------- right page: everything else, scrolling on its own ---------- */
+.right-frame { position: relative; height: 100vh; overflow: hidden; }
+.page.right { height: 100%; overflow-y: auto; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { .page.right { scroll-behavior: auto; } .detail { transition: none; } }
+.right-inner {
+  position: relative; min-height: 100%; display: flex; flex-direction: column; gap: clamp(14px, 1.8vw, 24px);
+  padding: clamp(16px, 2.2vw, 30px) var(--edge-pad) 22px var(--spine-pad);
+}
+.right-inner > :not(.shade) { position: relative; z-index: 1; width: 100%; max-width: 720px; margin-inline: auto; }
+
+.tempo-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px 18px; flex-wrap: wrap; }
+.tempo { margin: 0; font-size: 0.95rem; font-weight: 600; font-style: italic; line-height: 1.3; }
+.mm { font-style: normal; font-weight: 400; font-size: 0.84rem; margin-left: 0.35em; color: var(--ink-soft); }
+.music { font-family: var(--music); font-style: normal; }
+.line canvas { display: block; width: 100%; height: 0; }
+.tempo-row + canvas { margin-top: 2px; }
+
+.movement h2 {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 0.45em;
+  margin: 0 0 0.5em; font-weight: 500; font-size: clamp(1.35rem, 1.9vw, 1.7rem); line-height: 1.2;
+}
+.movement h2 .num { font-family: var(--display); font-weight: 500; }
+.tempo-word { margin-left: auto; font-size: 0.95rem; font-weight: 700; font-style: italic; }
+
+.works { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 20px) clamp(16px, 2vw, 28px); }
+.work .no, .piece .medium { margin: 0; font-style: italic; color: var(--ink-soft); font-size: 0.8rem; line-height: 1.3; }
+.work h3, .piece h3 { margin: 0.05em 0 0; font-weight: 500; font-size: 0.96rem; line-height: 1.25; }
+.work .type { margin: 0 0 0.2em; font-size: 0.82rem; line-height: 1.3; color: var(--ink-soft); }
+.work p, .piece p { margin: 0 0 0.25em; font-size: 0.82rem; line-height: 1.38; }
+.work .brace, .piece .brace { font-size: 0.8rem; margin-left: -0.6em; margin-top: 0.05em; }
+
+.pieces { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(16px, 2vw, 26px); }
+.about p { margin: 0 0 0.6em; max-width: 40em; font-size: 0.98rem; }
+.about .lede { font-size: 1.15rem; line-height: 1.45; }
+
+.page-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 0.82rem; color: var(--ink-soft); margin-top: auto; padding-top: 6px; }
+.folio { font-family: var(--display); font-size: 0.9rem; margin-left: auto; }
+
+/* ---------- the page turn: a dark, diffused shadow across both pages ---------- */
+.turn { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 100; pointer-events: none; display: block; }
+.turn.on { pointer-events: auto; }
+/* the shadow's grain: one speck per screen pixel, blended so it only shows in the dark, never on white paper */
+.turn-grain { position: fixed; inset: 0; z-index: 101; pointer-events: none; opacity: 0; mix-blend-mode: overlay;
+              transition: opacity 0.2s ease; }
+.turn-grain.on { opacity: 0.42; }
+
+/* ---------- the head of a sheet: title, subtitle and composer, as on a printed piece ---------- */
+.sheet-head { text-align: center; padding-top: 4px; }
+.sheet-title { margin: 0; font-family: var(--title); font-weight: 400; text-transform: uppercase; letter-spacing: 0.07em;
+               font-size: clamp(1.5rem, 2.4vw, 2.3rem); line-height: 1.15; }
+.sheet-sub { margin: 0.3em 0 0; font-size: 0.98rem; }
+.sheet-by { margin: 0.6em 0 0; text-align: right; font-size: 0.95rem; }
+
+/* ---------- the contents page ---------- */
+.toc-group h3 { margin: 0 0 0.35em; font-weight: 400; font-style: italic; font-size: 1.3rem; color: var(--ink-soft); }
+.toc { list-style: none; margin: 0; padding: 0; }
+.toc-entry {
+  display: flex; align-items: baseline; gap: 0.6em; width: calc(100% + 1.2em); margin: 0 -0.6em; padding: 0.42em 0.6em;
+  font: inherit; font-size: 1rem; color: var(--ink); text-align: left; background: transparent; border: 0; border-radius: 999px; cursor: pointer;
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+.toc-entry:hover, .toc-entry:focus-visible { background-color: rgba(96, 96, 96, 0.08); box-shadow: 0 0 12px 6px rgba(96, 96, 96, 0.08); outline: none; }
+.toc-entry .no { flex: none; width: 3.4em; font-style: italic; color: var(--ink-soft); font-size: 0.9em; }
+.toc-entry .t { flex: 0 1 auto; }
+.toc-entry .leader { flex: 1 1 2em; min-width: 2em; overflow: hidden; white-space: nowrap; color: var(--ink-soft); letter-spacing: 0.15em; }
+.toc-entry .meta { flex: none; font-style: italic; color: var(--ink-soft); font-size: 0.9em; }
+
+/* ---------- turning to the next piece: appears once you reach the end of the description ---------- */
+.turn-page { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-top: 6px;
+             opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity 0.6s ease, transform 0.6s ease; }
+.turn-page.ready { opacity: 1; transform: none; pointer-events: auto; }
+.turn-page .next { margin-left: auto; text-align: right; flex-wrap: wrap; justify-content: flex-end; }
+.turn-page .next-title { flex-basis: 100%; margin-top: 0.3em; font-style: italic; font-size: 0.85rem; color: var(--ink-soft); }
+@media (prefers-reduced-motion: reduce) { .turn-page { transition: none; transform: none; } }
+
+/* ---------- a project's title page ---------- */
+#project .page.left .title-page { margin-top: calc(6vh + 80px); }      /* clear of the navigation */
+/* SPACING on a project's title page (top to bottom). Raise a number for more space:  */
+#project .page.left .opus { margin-top: 1.1em; }        /* gap above "No. #" (below the subtitle) */
+#project .page.left { padding-bottom: 4vh; }                      /* room below the popup's foot line */
+
+/* ---------- the picture popup ----------
+   Pictures for a section of the description slide up this stage while the title block dissolves in grain.
+   They start from the stage's bottom edge, which sits --pop-foot above the foot of the left page.
+   The pictures are sized in views.js (layoutPopup): rows of equal height, each picture in its own proportions. */
+:root { --pop-foot: 7vh; }                                       /* the line the popup slides up from: its distance above the page's foot */
+.popup-stage { position: absolute !important; z-index: 2 !important; left: var(--edge-pad); right: var(--spine-pad);
+               top: calc(6vh + 110px); bottom: var(--pop-foot); overflow: hidden; }   /* the top clears the navigation */
+.popup { position: absolute; inset: 0; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+         transform: translateY(calc((1 - var(--p, 0)) * 100%)); }
+.pop-row { display: flex; justify-content: center; align-items: flex-start; gap: 8px; flex: none; }
+.pop-fig { margin: 0; flex: none; display: flex; flex-direction: column; min-width: 0; }
+.pop-fig > img, .pop-fig > iframe { display: block; width: 100%; border: 0; box-shadow: 0 1px 12px rgba(0, 0, 0, 0.14); }   /* no frame: just the picture */
+.pop-fig figcaption { height: 34px; overflow: hidden; padding-top: 0.3em; box-sizing: border-box; text-align: center; font-style: italic;
+                      font-size: 0.78rem; line-height: 1.25; color: var(--ink-soft);
+                      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pop-fig figcaption a { color: inherit; text-underline-offset: 0.18em; }
+/* a set of many photos: pointing at one enlarges it from its own corner */
+.pop-row.grid .pop-fig { position: relative; transition: transform 0.3s ease; }
+.pop-row.grid .pop-fig:hover { transform: scale(2.3); z-index: 6; }
+.pop-row.grid .pop-fig:hover > img { box-shadow: 0 8px 26px rgba(0, 0, 0, 0.28); }
+.pop-grain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }   /* paper-white grain that dissolves the popup in and out */
+.title-grain { position: absolute; left: -24px; top: -14px; width: calc(100% + 48px); height: calc(100% + 28px); pointer-events: none; z-index: 5; }   /* the same grain over the title block */
+@media (prefers-reduced-motion: reduce) { .pop-row.grid .pop-fig { transition: none; } }
+
+/* The right page's shading is drawn for the visible page only and stays put while the description scrolls.
+   (A canvas as tall as the whole description is too big for some browsers, which then draw nothing.) */
+#project .page.right > .shade { position: sticky; inset: auto; top: 0; display: block; width: 100%; height: 100vh; margin-bottom: -100vh; z-index: 0; }
+@media (max-width: 900px) { #project .page.right > .shade { height: 100svh; margin-bottom: -100svh; } }
+
+/* ---------- the description snaps block by block ----------
+   Each section settles at the top of the page; the left page then shows that section's pictures. */
+@media (min-width: 901px) {
+  :root { --snap-top: 7vh; }                                   /* where a section settles: its distance from the top of the page */
+  #project .page.right { scroll-snap-type: y mandatory; scroll-padding-top: var(--snap-top); }   /* "proximity" snaps more loosely */
+  #project .sheet-head { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 120px; }   /* the opening position, with the title */
+  #project .slot .block { scroll-snap-align: start; scroll-snap-stop: always; }   /* "always": a hard flick stops at the next section instead of skipping past it */
+  #project .right-inner > .page-foot { scroll-snap-align: end; }                                 /* so the very end stays reachable */
+}
+
+/* the section you're reading gets the same soft haze as the buttons */
+.slot .block { margin-inline: -12px; padding: 6px 12px; transition: background-color 0.4s ease, box-shadow 0.4s ease; outline: none; }
+.slot .block.active { background-color: rgba(96, 96, 96, 0.05); box-shadow: 0 0 16px 8px rgba(96, 96, 96, 0.05); }
+
+/* ---------- a project's music sheet: description between the lines of music ---------- */
+.slot:empty { display: none; }
+.slot h3 { margin: 0 0 0.4em; font-weight: 400; font-size: 1.4rem; }
+.slot h3 .num { font-style: italic; color: var(--ink-soft); margin-right: 0.35em; font-size: 0.85em; }
+.slot p { margin: 0 0 0.65em; max-width: 42em; font-size: 0.98rem; line-height: 1.55; }
+.slot .lede { font-size: 1.12rem; line-height: 1.5; }
+.slot .facts p { margin: 0 0 0.15em; font-style: italic; color: var(--ink-soft); font-size: 0.92rem; }
+.slot .facts { margin: 0 0 0.9em; }
+.slot figure { margin: 0.4em 0 0.6em; }
+.slot figure img { display: block; width: min(100%, 760px); max-width: 100%; height: auto; margin: 0 auto; border: 1px solid rgba(38, 38, 38, 0.12); }
+/* two or more images side by side (a `figs` panel in content.js) */
+.slot .fig-row { display: flex; gap: 14px; align-items: flex-start; margin: 0.4em 0 0.6em; }
+.slot .fig-row figure { flex: 1 1 0; min-width: 0; margin: 0; }
+.slot .fig-row figure img { width: 100%; }
+.slot .fig-row figcaption { font-size: 0.82rem; line-height: 1.35; }
+.slot .fig-row.many { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* many photos in the description (narrow screens): a grid */
+.slot .fig-row.many figure { margin: 0; }
+@media (max-width: 560px) { .slot .fig-row.many { grid-template-columns: repeat(2, 1fr); } }
+.slot .plate {                                        /* placeholder for an image, in stippled dots */
+  aspect-ratio: 16 / 9; width: 100%; border: 1px solid rgba(38, 38, 38, 0.16);
+  background-image: radial-gradient(rgba(38, 38, 38, 0.18) 0.7px, transparent 0.9px);
+  background-size: 5px 5px; display: grid; place-items: center; color: var(--ink-soft); font-style: italic;
+}
+.slot figcaption { margin-top: 0.45em; font-size: 0.88rem; color: var(--ink-soft); font-style: italic; }
+.slot .block + .block { margin-top: 0.8em; }
+
+/* labelled overview rows (Team / Role / Built with / Target users) and bulleted lists, set by `facts` and `list` in content.js */
+.slot .spec { display: grid; grid-template-columns: 7.5em 1fr; gap: 0.5em 1em; margin: 0 0 0.9em; }
+.slot .spec dt { font-style: italic; color: var(--ink-soft); font-size: 0.9rem; }
+.slot .spec dd { margin: 0; font-size: 0.98rem; line-height: 1.5; }
+.slot .bullets { margin: 0 0 0.65em; padding-left: 1.2em; font-size: 0.98rem; line-height: 1.55; }
+.slot .bullets li { margin-bottom: 0.3em; }
+
+/* ---------- phones and narrow windows: the pages stack ---------- */
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .spread { display: block; height: auto; }
+  .page.left { height: auto; min-height: 100svh; padding: 22px 22px 40px; }
+  #project .page.left { padding-bottom: 40px; }
+  .popup-stage, .title-grain { display: none !important; }   /* stacked pages: pictures stay in the description instead */
+  #project .page.left .title-page { margin-top: 6vh; }
+  .call-number { position: static !important; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.3em 1.4em; margin-bottom: 4vh; }
+  .title-page { margin-top: 10vh; }
+  .name { margin-top: 9vh; }
+  .imprint { margin-top: 12vh; }
+  .right-frame, .page.right { height: auto; overflow: visible; }
+  .toc-entry { flex-wrap: wrap; }
+  .toc-entry .leader { display: none; }
+  .toc-entry .meta { width: 100%; padding-left: 4em; }
+  .right-inner { padding: 22px 20px; }
+  .detail { position: fixed; z-index: 50; }
+  .turn { position: fixed; z-index: 52; }
+  .detail { padding: 20px; }
+  .works { grid-template-columns: 1fr 1fr; }
+  .pieces { grid-template-columns: 1fr 1fr; }
+  .panel { flex-basis: 86%; }
+}

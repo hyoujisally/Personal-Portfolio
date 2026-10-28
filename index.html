@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selected Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,600;1,700&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Noto+Music&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portfolio.css">
+</head>
+<body>
+<main>
+
+  <!-- ===================== THE OPENING SPREAD: title page and contents ===================== -->
+  <div class="spread" id="home">
+    <article class="page left" aria-label="Title page">
+      <canvas class="shade" aria-hidden="true"></canvas>
+      <nav class="call-number" aria-label="Sections">
+<a class="brace literal ink-text" href="#" data-go="contents"><span class="b">{</span><span class="label">Home</span><span class="b">}</span></a>
+        <div class="menu">
+          <button class="brace literal works-toggle ink-text" type="button" aria-expanded="false"><span class="b">{</span><span class="label">Works</span><span class="caret" aria-hidden="true">&#x25BE;</span><span class="b">}</span></button>
+          <ul class="works-menu" hidden></ul>
+          <canvas class="menu-grain" aria-hidden="true" hidden></canvas>
+        </div>
+        <a class="brace literal ink-text" href="#" data-open="about"><span class="b">{</span><span class="label">About</span><span class="b">}</span></a>
+      </nav>
+      <header class="title-page">
+        <h1 class="ink-text"><a class="home" href="#" aria-label="Selected Works, back to the start">Selected Works</a></h1>
+        <p class="paren ink-text">(Portfolio)</p>
+        <p class="opus ink-text">Op. 1</p>
+      </header>
+      <p class="name ink-text">Hyouji Sally Joo</p>
+      <footer class="imprint">
+        <p class="email"><a class="ink-text" href="mailto:hyoujijoo@gmail.com">hyoujijoo@gmail.com</a></p>
+        <p class="linkedin"><a class="ink-text" href="https://linkedin.com/in/hyoujijoo">linkedin.com/in/hyoujijoo</a></p>
+      </footer>
+    </article>
+
+    <div class="right-frame">
+      <article class="page right" aria-label="Contents">
+        <div class="right-inner">
+          <canvas class="shade" aria-hidden="true"></canvas>
+          <header class="sheet-head">
+            <h2 class="sheet-title ink-text">Contents</h2>
+            <p class="sheet-sub ink-text">(Selected Works)</p>
+            <p class="sheet-by ink-text">By Hyouji Sally Joo.</p>
+          </header>
+          <section class="toc-group" id="toc-works" aria-labelledby="toc-works-h">
+            <h3 id="toc-works-h" class="ink-text grain-full">Works</h3>
+            <ol class="toc" id="toc-works-list"></ol>
+          </section>
+          <section class="toc-group" id="toc-creatives" aria-labelledby="toc-creatives-h">
+            <h3 id="toc-creatives-h" class="ink-text grain-full">Creatives</h3>
+            <ol class="toc" id="toc-creatives-list"></ol>
+          </section>
+          <section class="toc-group" aria-label="About">
+            <ol class="toc" id="toc-about-list"></ol>
+          </section>
+          <footer class="page-foot">
+            <span class="folio ink-text">2</span>
+          </footer>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== A PROJECT'S SPREAD: its title page and its music sheet ===================== -->
+  <div class="spread" id="project" hidden>
+    <article class="page left" aria-label="Project title page">
+      <canvas class="shade" aria-hidden="true"></canvas>
+      <nav class="call-number" aria-label="Pages">
+<a class="brace literal" href="#" data-go="contents"><span class="b">{</span><span class="label">Home</span><span class="b">}</span></a>
+        <div class="menu">
+          <button class="brace literal works-toggle" type="button" aria-expanded="false"><span class="b">{</span><span class="label">Works</span><span class="caret" aria-hidden="true">&#x25BE;</span><span class="b">}</span></button>
+          <ul class="works-menu" hidden></ul>
+          <canvas class="menu-grain" aria-hidden="true" hidden></canvas>
+        </div>
+        <a class="brace literal" href="#" data-open="about"><span class="b">{</span><span class="label">About</span><span class="b">}</span></a>
+      </nav>
+      <header class="title-page">
+        <h1 id="p-title">Project</h1>
+        <p class="paren" id="p-sub"></p>
+        <p class="opus" id="p-no"></p>
+        <canvas class="title-grain" aria-hidden="true"></canvas>
+      </header>
+      <!-- the picture popup: slides up the left page when the description reaches a section with pictures -->
+      <div class="popup-stage" role="group" aria-label="Project visuals" hidden>
+        <div class="popup"></div>
+        <canvas class="pop-grain" aria-hidden="true"></canvas>
+      </div>
+    </article>
+
+    <div class="right-frame">
+      <article class="page right" aria-label="Project description">
+        <canvas class="shade" aria-hidden="true"></canvas>
+        <div class="right-inner">
+          
+          <header class="sheet-head">
+            <h2 class="sheet-title" id="s-title"></h2>
+            <p class="sheet-sub" id="s-sub"></p>
+            <p class="sheet-by">By Hyouji Sally Joo.</p>
+          </header>
+          <div class="line">
+            <div class="tempo-row">
+              <p class="tempo">Adagio cantabile<span class="mm">(<span class="music">&#x2669;</span> = 40)</span></p>
+              <button id="play" class="brace literal" type="button" aria-pressed="false"><span class="b">{</span><span class="label">Play</span><span class="b">}</span></button>
+            </div>
+            <canvas id="line1" role="img" aria-label="Engraved score, bars 1 to 4 of the second movement of Beethoven’s Pathétique sonata."></canvas>
+          </div>
+          <div class="slot"></div>
+          <div class="line"><canvas id="line2" role="img" aria-label="Engraved score, bars 5 to 8."></canvas></div>
+          <div class="slot"></div>
+          <div class="line"><canvas id="line3" role="img" aria-label="Engraved score, bars 9 to 12."></canvas></div>
+          <div class="slot"></div>
+          <div class="line"><canvas id="line4" role="img" aria-label="Engraved score, bars 13 to 16, ending in a repeat."></canvas></div>
+          <div class="slot"></div>
+          <nav class="turn-page" aria-label="More pieces">
+            <a class="brace literal" href="#" data-go="prev"><span class="b">{</span><span class="label">Previous</span><span class="b">}</span></a>
+            <a class="brace literal next" href="#" data-go="next"><span class="b">{</span><span class="label">Next</span><span class="b">}</span><span class="next-title" id="next-title"></span></a>
+          </nav>
+          <footer class="page-foot">
+            <span>Beethoven, Piano Sonata No. 8 in C minor, Op. 13 “Pathétique”, second movement, bars 1–16</span>
+            <span class="folio" id="s-folio">3</span>
+          </footer>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <canvas class="turn" aria-hidden="true"></canvas>
+  <div class="turn-grain" aria-hidden="true"></div>
+</main>
+
+<!-- the scripts, in the order they depend on each other -->
+<script src="js/settings.js"></script>
+<script src="js/score.js"></script>
+<script src="js/ink.js"></script>
+<script src="js/engraving.js"></script>
+<script src="js/paper.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/turn.js"></script>
+<script src="js/content.js"></script>
+<script src="js/views.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
